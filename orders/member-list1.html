@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+  <meta charset="UTF-8">
+  <title>订单</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"
+  />
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/xadmin.css">
+  <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+
+  <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+  <div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+      <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+    </a>
+  </div>
+  <div class="layui-fluid">
+    <form class="layui-form">
+
+      <div class=" layui-col-space5">
+        <div class="layui-form-item layui-input-inline layui-show-xs-block" style="height: 35px;">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline layui-show-xs-block">
+            <select type="text" name="zt" required="" autocomplete="off" class="layui-input">
+              <option value="3">全部</option>
+              <option value="0">待发货</option>
+              <option value="1">发货中</option>
+              <option value="2">已完成</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-form-item layui-input-inline layui-show-xs-block" style="height: 35px;">
+          <label class="layui-form-label">发货方式</label>
+          <div class="layui-input-inline layui-show-xs-block">
+            <select type="text" name="pay_id" required="" autocomplete="off" class="layui-input">
+              <option value="3">全部</option>
+              <option value="2">自取</option>
+              <option value="1">快递</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-form-item layui-input-inline layui-show-xs-block">
+          <button class="layui-btn" type="button" onclick="serachUser()">
+            <i class="layui-icon"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <table id="yourtable" class="table table-bordered table-striped"></table>
+  </div>
+</body>
+<script src="../js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/bootstrap-table.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/config.js" type="text/javascript"></script>
+<script src="../js/util.js" type="text/javascript"></script>
+<script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+<script src="../lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="../js/xadmin.js"></script>
+<script src="http://lib.h-ui.net/layer/3.1.1/layer.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  layui.use(['form', 'layer'],
+    function () {
+      $ = layui.jquery;
+      var form = layui.form,
+        layer = layui.layer;
+    });
+  a()
+  function a() {
+    $('#yourtable').bootstrapTable({
+      contentType: "application/x-www-form-urlencoded",
+      url: api_url + '/admin.php/orders/orders_list',
+      method: "get",
+      dataType: "json",
+      striped: true, //隔行变色
+      cache: false, //是否使用缓存
+      showColumns: false, // 列
+      pagination: true, //分页
+      paginationPreText: "上一页",
+      paginationNextText: "下一页",
+      showPaginationSwitch: false, //是否显示数据条数选择框
+      sortable: false, //是否启用排序
+      singleSelect: false,
+      search: false, //显示搜索框
+      buttonsAlign: "right", //按钮对齐方式
+      showRefresh: false, //是否显示刷新按钮
+      sidePagination: "server", //客户端处理分页　服务端：server
+      pageNumber: 1,
+      pageSize: 10,
+      pageList: [10], //自定义每页的数量
+      undefinedText: '',
+      uniqueId: "id", //每一行的唯一标识，一般为主键列
+      toolbar: '#toolbar', //工具按钮用哪个容器
+      strictSearch: true,
+      queryParams: queryParams,
+      queryParamsType: '',
+      onCheck: function (e, value, row, index) {
+        $('#online').attr('disabled', false)
+
+      },
+      onUncheck: function () {
+        if ($('input[name=btSelectItem]:checked').length == 0) {
+          $('#online').attr('disabled', true)
+        }
+      },
+      onCheckAll: function () {
+        $('#online').attr('disabled', false)
+      },
+      onUncheckAll: function () {
+        $('#online').attr('disabled', true)
+      },
+      columns: [{
+        title: '全选',
+        checkbox: true,
+      },
+      {
+        title: '经销商',
+        field: 'sales_name',
+        align: 'center',
+        valign: 'middle',
+      },
+      {
+        title: '总金额',
+        field: 'money',
+        align: 'center',
+        valign: 'middle',
+      },
+      {
+        title: '总件数',
+        field: 'num',
+        align: 'center',
+        valign: 'middle',
+
+      },
+      {
+        title: '下单时间',
+        field: 'insert_time',
+        align: 'center',
+        valign: 'middle',
+        width: 200
+      },
+      {
+        title: '发货方式',
+        field: 'send_type',
+        align: 'center',
+        valign: 'middle',
+        formatter: function (value, row, index) {
+          if (row.send_type == 1) {
+            return '快递'
+          } else {
+            return '自取'
+          }
+        }
+      },
+      {
+        title: '状态名称',
+        field: 'zt_name',
+        align: 'center',
+        valign: 'middle',
+      },
+      {
+        title: '订单编码',
+        field: 'ordernum',
+        align: 'center',
+        valign: 'middle',
+      },
+      {
+        title: '规格',
+        field: 'send_type',
+        align: 'center',
+        valign: 'middle',
+        formatter: function (value, row, index) {
+          var m = ''
+          for (let i in row.list) {
+            m += '<p><span>商品名：' + row.list[i].goods_name + '</span>，<span>颜色：' + row.list[i].goods_color_name + '</span>，<span>尺码：' + row.list[i].size + '</span></p>'
+          }
+          return m
+        }
+      },
+      {
+        title: '订单详情',
+        field: 'color',
+        align: 'center',
+        valign: 'middle',
+        width: 200,
+        formatter: function (value, row, index) {
+          var a = '<a href="member-list1-detail.html?ordernum=' + row.ordernum + '" class="layui-btn layui-btn layui-btn-xs" >订单详情</a>'
+          var b = '<a onclick="del(this)" order="' + row.ordernum + '"  class="layui-btn layui-btn layui-btn-xs" >删除</a>'
+          var c = '<a onclick="finsha(1,this)" order="' + row.ordernum + '"  class="layui-btn layui-btn layui-btn-xs" >发货</a>'
+          var cc = '<a  onclick="xadminopen(this)" order="' + row.ordernum + '"  class="layui-btn layui-btn layui-btn-xs layui-btn-warm" >发货</a>'
+          var d = '<a onclick="finsha(2,this)" order="' + row.ordernum + '"  class="layui-btn layui-btn layui-btn-xs" >完成</a>'
+          var e = '<a href="edit.html?order=' + row.ordernum + '"   class="layui-btn layui-btn layui-btn-xs" >修改</a>'
+          if (row.zt == 0) {
+            if (row.send_type == 1) {
+              return a + cc + b
+            } else {
+              return a + c + b
+            }
+          } else if (row.zt == 1) {
+            return a + b + d
+          } else {
+            return a + b
+          }
+        }
+      }
+      ],
+      locale: 'zh-CN', //中文支持,
+      responseHandler: function (res) {
+        if (res) {
+          return {
+            'rows': res.data.list,
+            'total': res.data.count
+          }
+        } else {
+          return {
+            "rows": [],
+            "total": 0
+          };
+        }
+      },
+    });
+  }
+  //得到查询的参数
+  function queryParams(params) {
+    temp = { //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+      pageSize: params.pageSize, //页面大小
+      page: params.pageNumber, //页码
+      zt: $("select[name=zt] option:selected").val(),
+      pay_id: $("select[name=pay_id] option:selected").val(),
+    };
+    return temp;
+  };
+  function xadminopen(m) {
+    layer.prompt({
+      formType: 3,
+      title: '请填写订单号',
+      offset: ['300px', 'calc(50% - 135px)'],
+      btnAlign: 'c',
+      yes: function (index, layero) {
+        // 获取文本框输入的值
+        var value = layero.find(".layui-layer-input").val();
+        util.post({
+          url: api_url + '/admin.php/orders/orders_edit',
+          data: { ordernum: $(m).attr('order'), zt: 1, courier_number: value },
+          callback: function (data) {
+            if (data.code == 1) {
+              layer.msg(data.msg, { icon: 1, time: 1000 });
+              $("#yourtable").bootstrapTable('destroy');
+              a()
+            } else {
+              layer.msg(data.msg, { icon: 1, time: 1000 });
+            }
+          }
+        });
+        layer.close(index);
+
+      }
+    });
+  }
+
+  // layer.prompt({title: '输入订单号', formType: 3,offset:['300px', 'calc(50% - 135px)'],btn: ["确定","取消"]}, function(pass, index){
+  //  console.log(index)
+  //   layer.close(index)
+  // });
+  function del(obj) {
+
+    layer.confirm('确认要删除吗？', function (index) {
+      util.post({
+        url: api_url + '/admin.phporders/orders_del',
+        data: { ordernum: $(obj).attr('order'), del: 1 },
+        callback: function (data) {
+          if (data.code == 1) {
+            layer.msg('已删除!', { icon: 1, time: 1000 });
+            $("#yourtable").bootstrapTable('destroy');
+            a()
+          } else {
+            layer.msg(data.msg, { icon: 1, time: 1000 });
+          }
+        }
+      });
+    });
+  }
+  function finsha(obj, s) {
+    var t = '确认要发货吗？'
+    var z = '已发货？'
+    if (obj == 2) {
+      t = '确定已完成？'
+      z = '已完成'
+    }
+    layer.confirm(t, function (index) {
+      util.post({
+        url: api_url + '/admin.php/orders/orders_finish',
+        data: { ordernum: $(s).attr('order'), zt: obj },
+        callback: function (data) {
+          if (data.code == 1) {
+            layer.msg(z, { icon: 1, time: 1000 });
+            $("#yourtable").bootstrapTable('destroy');
+            a()
+          } else {
+            layer.msg(data.msg, { icon: 1, time: 1000 });
+          }
+        }
+      });
+    });
+  }
+  function serachUser() {
+    $("#yourtable").bootstrapTable('destroy');
+    a()
+  }
+</script>
+
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+  <meta charset="UTF-8">
+  <title>产品修改</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"
+  />
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/xadmin.css">
+  <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../js/xadmin.js"></script>
+  <style>
+    .imglist {
+      width: 70px;
+      height: 75px;
+      position: relative;
+      display: inline-block;
+      margin-left: 5px
+    }
+
+    .close {
+      position: absolute;
+      height: 15px;
+      width: 15px;
+      text-align: center;
+      line-height: 15px;
+      border: 1px solid #eeeeee;
+      right: 0;
+      top: 0;
+    }
+
+    .sx {
+      border-bottom: 1px dashed black;
+      padding: 10px 0;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layui-fluid">
+    <div class="layui-row">
+      <div class="layui-card-body " style="padding: 0;height: 30px;padding-right: 20px;">
+        <div class=" layui-col-space5">
+          <a class="layui-btn layui-btn-small" style="margin:5px 0;float:right" onclick="window.history.go(-1);" title="返回">
+            返回
+          </a>
+        </div>
+      </div>
+      <form class="layui-form">
+        <input type="hidden" value="" name="user_id">
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">
+            <span class="x-red"></span>个人返利规则</label>
+          <div class="layui-input-block">
+            <button type="button" class="layui-btn" onclick="addshu()">添加</button>
+          </div>
+        </div>
+        <div class="shuxing" style="display: none">
+          <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+              <span class="x-red">*</span>名称
+            </label>
+            <div class="layui-input-inline">
+              <input type="text" id="" name="name" required="" lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <button type="button" class="layui-btn" onclick="adda(this)">添加规则</button>
+          <div class="nasha" style="display: none">
+            <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>最低销售量
+              </label>
+              <div class="layui-input-inline">
+                <input type="text" id="" name="min" required="" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>最高销售量
+              </label>
+              <div class="layui-input-inline">
+                <input type="text" id="" name="max" required="" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>返利百分比
+              </label>
+              <div class="layui-input-inline">
+                <input type="text" id="" name="bfb" required="" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>每双奖励多少
+              </label>
+              <div class="layui-input-inline">
+                <input type="text" id="" name="jiang" required="" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+          </div>
+          <div class="av"></div>
+        </div>
+        <div class="shuxings"></div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">
+            <span class="x-red"></span>门店返利规则</label>
+          <div class="layui-input-block">
+            <button type="button" class="layui-btn" onclick="addstore()">添加</button>
+          </div>
+        </div>
+        <div class="stores"></div>
+      </form>
+      <div class="layui-form-item">
+        <label for="L_repass" class="layui-form-label">
+        </label>
+        <button class="layui-btn submit" lay-filter="add" onclick="sub()">
+          提交
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="../js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../js/config.js" type="text/javascript"></script>
+  <script src="../js/util.js"></script>
+  <script>
+    var ids = util.getQuery('id')
+    layui.use(['form', 'layer'],
+      function () {
+        $ = layui.jquery;
+        var form = layui.form,
+          layer = layui.layer;
+      });
+    if (ids) {
+      var datas = JSON.parse(sessionStorage.getItem('datas'))
+      $('#username').val(datas.name)
+      $('input[name=thum_pic]').val(datas.thum_pic)
+      $('#thum_pic').attr('src', datas.thum_pic)
+      var c = datas.color
+      console.log(c)
+      for (let i in c) {
+        var ht = $('.shuxing').html()
+        $('.shuxings').append('<div class="sx">' + ht + '</div>')
+        $('.sx').eq(i).find('input[name=name]').val(c[i].name)
+        $('.sx').eq(i).find('input[name=size]').val(c[i].size)
+        $('.sx').eq(i).find('.himg').val(c[i].detail_pic)
+        $('.sx').eq(i).find('.ximg').val(c[i].detail_pic)
+        $('.sx').eq(i).find('input[name=price1]').val(c[i].price1)
+        $('.sx').eq(i).find('input[name=price]').val(c[i].price)
+        var f = c[i].size_num
+        for (let m in f) {
+          var ht = $('.nasha').html()
+          $('.sx').eq(i).find('.av').append('<div class="avi">' + ht + '</div>')
+          $('.sx').eq(i).find('.av').find('.avi').eq(m).find('input[name=size]').val(f[m].size)
+          $('.sx').eq(i).find('.av').find('.avi').eq(m).find('input[name=kucun]').val(f[m].num)
+        }
+        $('.sx').eq(i).find('.pimg').append('<div class="imglist imglists"><div class="close" onclick="del(this)">x</div><input type="hidden" name="" class="himg" value="' + c[i].detail_pic + '" autocomplete="off"><img id="" width="70" height="75" src="' + c[i].detail_pic + '"></div>')
+      }
+    }
+    function sub() {
+      var url = '/admin.php/rules/add'
+      var personal = []
+      $('.shuxings .sx').each(function () {
+        var rules = []
+        $(this).find('.avi').each(function () {
+          rules.push({ min: $(this).find('input[name=min]').val(), max: $(this).find('input[name=max]').val(), bfb: $(this).find('input[name=bfb]').val(), jiang: $(this).find('input[name=jiang]').val() })
+        })
+        personal.push({
+          name: $(this).find('input[name=name]').val(),
+          rules: rules
+        })
+      })
+      var stores = []
+      $('.stores .sx').each(function () {
+        var rules = []
+        $(this).find('.avi').each(function () {
+          rules.push({ min: $(this).find('input[name=min]').val(), max: $(this).find('input[name=max]').val(), bfb: $(this).find('input[name=bfb]').val(), jiang: $(this).find('input[name=jiang]').val() })
+        })
+        stores.push({
+          name: $(this).find('input[name=name]').val(),
+          rules: rules
+        })
+      })
+      var d = { personal: JSON.stringify(personal), stores: JSON.stringify(stores), edit: 0 }
+      if (ids) {
+        d = { personal: JSON.stringify(personal), stores: JSON.stringify(stores), edit: 1 }
+      }
+      console.log(d)
+      util.post({
+        url: api_url + url,
+        data: d,
+        callback: function (data) {
+          if (data.code == 1) {
+            $('.submit').attr('disabled', 'disabled')
+            layer.msg(data.msg);
+            setTimeout(() => {
+              window.location.href = "member-list2.html"
+            }, 1000);
+          } else {
+            $('.submit').attr('disabled', false)
+            layer.msg(data.msg);
+          }
+        }
+      });
+    }
+    function imgchange(obj) {
+      var file = obj.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function (e) {
+        var imgBase64Data = e.target.result;
+        var head = imgBase64Data.indexOf("4") + 2;
+        imgBase64Data = imgBase64Data.substring(head, imgBase64Data.length - head);
+        util.post({
+          url: api_url + '/admin.php/imgs/uploadImg',
+          data: {
+            img: imgBase64Data,
+          },
+          callback: function (data) {
+            $(obj).siblings('img').attr('src', data.data.url)
+            $(obj).siblings('input').val(data.data.url)
+          }
+        })
+      }
+    }
+    function imgchanges(obj) {
+      var file = obj.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function (e) {
+        var imgBase64Data = e.target.result;
+        var head = imgBase64Data.indexOf("4") + 2;
+        imgBase64Data = imgBase64Data.substring(head, imgBase64Data.length - head);
+        util.post({
+          url: api_url + '/admin.php/imgs/uploadImg',
+          data: {
+            img: imgBase64Data,
+          },
+          callback: function (data) {
+            $(obj).parents('.pimg').append(
+              '<div class="imglist imglists"><div class="close" onclick="del(this)">x</div>'
+              + '<input type="hidden" name="" class="himg" value="' + data.data.url + '" autocomplete="off">'
+              + '<img id="" width="70" height="75" src="' + data.data.url + '" class="touXiang ximg">'
+              + '</div>'
+            )
+            $(obj).siblings('input').val(data.data.url)
+          }
+        })
+      }
+    }
+    function del(o) {
+      $(o).parents('.imglist').remove()
+    }
+    function addshu() {
+      var ht = $('.shuxing').html()
+      $('.shuxings').append('<div class="sx">' + ht + '</div>')
+    }
+    function addstore() {
+      var ht = $('.shuxing').html()
+      $('.stores').append('<div class="sx">' + ht + '</div>')
+    }
+    function adda(a) {
+      var ht = $('.nasha').html()
+
+      $(a).siblings('.av').append('<div class="avi">' + ht + '</div>')
+    }
+  </script>
+
+</body>
+
+</html>

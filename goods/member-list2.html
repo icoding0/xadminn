@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"
+  />
+  <link rel="stylesheet" href="../css/font.css">
+  <link rel="stylesheet" href="../css/xadmin.css">
+  <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+  <script src="../lib/layui/layui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="../js/xadmin.js"></script>
+  <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+  <div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+      <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+    </a>
+  </div>
+  <div class="layui-card-body " style="padding: 0;height: 30px;padding-right: 20px;">
+    <div class=" layui-col-space5">
+      <a class="layui-btn layui-btn-small" style="margin:5px 0;float:right" href="add.html" title="刷新">
+        产品添加
+      </a>
+    </div>
+  </div>
+  <div class="layui-fluid">
+    <table id="yourtable" class="table table-bordered table-striped"></table>
+  </div>
+</body>
+<script src="../js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/bootstrap-table.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/util.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+  a()
+
+  function a() {
+    $('#yourtable').bootstrapTable({
+      contentType: "application/x-www-form-urlencoded",
+      url: api_url + '/admin.php/goods/goods_list',
+      method: "get",
+      dataType: "json",
+      striped: true, //隔行变色
+      cache: false, //是否使用缓存
+      showColumns: false, // 列
+      pagination: true, //分页
+      paginationPreText: "上一页",
+      paginationNextText: "下一页",
+      showPaginationSwitch: false, //是否显示数据条数选择框
+      sortable: false, //是否启用排序
+      singleSelect: false,
+      search: false, //显示搜索框
+      buttonsAlign: "right", //按钮对齐方式
+      showRefresh: false, //是否显示刷新按钮
+      sidePagination: "server", //客户端处理分页　服务端：server
+      pageNumber: 1,
+      pageSize: 10,
+      pageList: [10], //自定义每页的数量
+      undefinedText: '',
+      uniqueId: "id", //每一行的唯一标识，一般为主键列
+      toolbar: '#toolbar', //工具按钮用哪个容器
+      strictSearch: true,
+      queryParams: queryParams,
+      queryParamsType: '',
+      onCheck: function (e, value, row, index) {
+        $('#online').attr('disabled', false)
+
+      },
+      onUncheck: function () {
+        if ($('input[name=btSelectItem]:checked').length == 0) {
+          $('#online').attr('disabled', true)
+        }
+      },
+      onCheckAll: function () {
+        $('#online').attr('disabled', false)
+      },
+      onUncheckAll: function () {
+        $('#online').attr('disabled', true)
+      },
+      columns: [{
+        title: '全选',
+        checkbox: true,
+      },
+      {
+        title: '产品名称',
+        field: 'name',
+        align: 'center',
+        valign: 'middle',
+      },
+      {
+        title: '状态',
+        field: 'status',
+        align: 'center',
+        valign: 'middle',
+        formatter: function (value, row, index) {
+          if (row.status == 1) {
+            return '已上架'
+          } else {
+            return '已下架'
+          }
+        },
+      },
+      {
+        title: '颜色属性',
+        field: 'color',
+        align: 'center',
+        valign: 'middle',
+        width: 200,
+        formatter: function (value, row, index) {
+          var arr = []
+          for (let i in row.color) {
+            arr.push(row.color[i].name)
+          }
+          return arr
+          console.log((arr))
+        },
+      },
+      {
+        title: '主图',
+        field: 'thum_pic',
+        align: 'center',
+        valign: 'middle',
+        width: 200,
+        formatter: function (value, row, index) {
+
+          return '<img src="' + row.thum_pic + '" height="80" width="80">'
+          console.log((arr))
+        },
+      },
+      {
+        title: '操作',
+        field: '',
+        align: 'center',
+        valign: 'middle',
+        width: 200,
+        formatter: function (value, row, index) {
+          var a = '<a onclick="edit(' + row.goods_id + ',this)" datas=' + JSON.stringify(row) +
+            ' class="layui-btn layui-btn layui-btn-xs" >详情</a>'
+          var b = '<a onclick="del(this)" ids="' + row.goods_id +
+            '"  class="layui-btn layui-btn layui-btn-xs" >删除</a>'
+          var c = '<a onclick="finsha(1,this)" ids="' + row.goods_id +
+            '"  class="layui-btn layui-btn layui-btn-xs" >上架</a>'
+          var d = '<a onclick="finsha(2,this)" ids="' + row.goods_id +
+            '"  class="layui-btn layui-btn layui-btn-xs" >下架</a>'
+          var e = '<a  onclick="edit(' + row.goods_id + ',this)" datas=' + JSON.stringify(row) +
+            '  class="layui-btn layui-btn layui-btn-xs" >产品维护</a>'
+          if (row.status == 1) {
+            return a + d
+          } else if (row.status == 2) {
+            return c + e + b
+          }
+        }
+      }
+
+
+      ],
+      locale: 'zh-CN', //中文支持,
+      responseHandler: function (res) {
+        if (res) {
+          return {
+            'rows': res.data.list,
+            'total': res.data.count
+          }
+        } else {
+          return {
+            "rows": [],
+            "total": 0
+          };
+        }
+      },
+    });
+  }
+  //得到查询的参数
+  function queryParams(params) {
+    temp = { //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+      pageSize: params.pageSize, //页面大小
+      page: params.pageNumber, //页码
+      name: $("#search_name").val(),
+    };
+    return temp;
+  };
+
+  function finsha(obj, s) {
+    var t = '确认下架？'
+    var z = '已下架？'
+    if (obj == 1) {
+      t = '确定上架？'
+      z = '已上架'
+    }
+    layer.confirm(t, function (index) {
+      util.post({
+        url: api_url + '/admin.php/goods/goods_del',
+        data: {
+          goods_id: $(s).attr('ids'),
+          status: obj
+        },
+        callback: function (data) {
+          if (data.msg == '修改成功') {
+            layer.msg(z, {
+              icon: 1,
+              time: 1000
+            });
+            $("#yourtable").bootstrapTable('destroy');
+            a()
+          } else {
+            layer.msg(data.msg, {
+              icon: 1,
+              time: 1000
+            });
+          }
+        }
+      });
+    });
+  }
+
+  function del(s) {
+    var t = '确认删除？'
+    var z = '已删除？'
+    layer.confirm(t, function (index) {
+      console.log(1)
+      util.post({
+        url: api_url + '/admin.php/goods/goods_del',
+        data: {
+          goods_id: $(s).attr('ids'),
+          del: 1
+        },
+        callback: function (data) {
+          if (data.msg == '修改成功') {
+            layer.msg('删除成功', {
+              icon: 1,
+              time: 1000
+            });
+            $("#yourtable").bootstrapTable('destroy');
+            a()
+          } else {
+            layer.msg(data.msg, {
+              icon: 1,
+              time: 1000
+            });
+          }
+        }
+      });
+    });
+  }
+
+  function edit(id, obj) {
+    sessionStorage.setItem('datas', $(obj).attr('datas'))
+    location.href = 'add.html?id=' + id
+  }
+</script>
+
+</html>
